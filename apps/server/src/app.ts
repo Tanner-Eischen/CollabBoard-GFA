@@ -2,7 +2,10 @@ import cors from "cors";
 import express, { type Express } from "express";
 import type { AuthenticatedRequest } from "./middleware/auth.js";
 import { authMiddleware } from "./middleware/auth.js";
+import { errorHandler } from "./middleware/errorHandler.js";
+import { apiRateLimiter } from "./middleware/rateLimit.js";
 import anonRouter from "./routes/anon.js";
+import apiRouter from "./routes/index.js";
 
 const app: Express = express();
 
@@ -27,10 +30,14 @@ app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
+app.use("/api", apiRateLimiter);
 app.use("/api", anonRouter);
+app.use("/api", apiRouter);
 
 app.get("/api/me", authMiddleware, (req, res) => {
   res.json({ userId: (req as AuthenticatedRequest).userId });
 });
+
+app.use(errorHandler);
 
 export default app;

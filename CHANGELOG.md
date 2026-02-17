@@ -18,6 +18,31 @@ Project decision and progress log. Update this file on every commit.
   - <what to repeat/avoid next time>
 ```
 
+## 2026-02-17 - Task 9 CI dependency fix (zod, express-rate-limit)
+
+- Summary:
+  - Added missing server dependencies required by Task 9 runtime files: `zod` and `express-rate-limit`.
+  - Updated lockfile to ensure CI resolves validation and rate-limit imports during type-check.
+- Decisions:
+  - Kept dependency additions scoped to `apps/server` to avoid unrelated workspace churn.
+- Mistakes/Fixes:
+  - CI failed for Task 9 with missing module errors; fixed by adding dependencies via pnpm in the server package.
+- Lessons Learned:
+  - Local success can mask missing dependency declarations when packages exist transitively; CI type-check is the definitive dependency gate.
+
+## 2026-02-17 - Task 9: API Foundation runtime wiring and tests
+
+- Summary:
+  - Added Task 9 middleware and route foundation files (`errorHandler`, `rateLimit`, `validate`, `routes/index`, `boards`, `objects`, validator schemas).
+  - Wired `/api` middleware stack in `app.ts` with rate limiting, route mounting, and global error handler.
+  - Added unit/integration coverage for validators, error formatting, rate limiting, and middleware stack behavior.
+- Decisions:
+  - Kept board/object endpoints as stub handlers for this task while fully enforcing validation/auth/error contracts.
+- Mistakes/Fixes:
+  - Initial branch state had duplicated blocks in newly-added files and tests; rebuilt affected files cleanly and re-ran full checks.
+- Lessons Learned:
+  - For foundation tasks, acceptance confidence improves when middleware behavior is proven with focused tests, not just file presence.
+
 ## 2026-02-17 - Task 5: Startup DB/Redis connectivity verification
 
 - Summary:
