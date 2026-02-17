@@ -1,7 +1,12 @@
-import app from './app.js';
+import { createServer } from "http";
+import app from "./app.js";
+import { createSocketServer } from "./socket/index.js";
 
 const PORT = process.env.PORT || 3001;
 
-app.listen(PORT, () => {
+const httpServer = createServer(app);
+createSocketServer(httpServer);
+
+httpServer.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);
 });
