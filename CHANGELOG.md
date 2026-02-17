@@ -18,6 +18,22 @@ Project decision and progress log. Update this file on every commit.
   - <what to repeat/avoid next time>
 ```
 
+## 2026-02-17 - Task 7: Database Schema & Prisma Setup
+
+- Summary:
+  - Added Prisma ORM with PostgreSQL schema (Users, Boards, Objects, Sessions) matching ARCHITECTURE.md.
+  - Created Prisma client singleton in `apps/server/src/lib/prisma.ts`.
+  - Added initial migration, seed script, and db:migrate/db:studio scripts.
+  - CI now runs Postgres service and `prisma migrate deploy` before tests; database integration test runs when DATABASE_URL is set.
+  - Dockerfile CMD runs migrations before starting the server for Render deploy.
+- Decisions:
+  - Used `prisma migrate diff` to generate initial migration without requiring local DB for commit.
+  - Prisma client singleton prevents multiple instances in dev (hot reload) and enables connection pooling in production.
+- Mistakes/Fixes:
+  - none this commit
+- Lessons Learned:
+  - Prisma 6 deprecates `package.json#prisma` in favor of `prisma.config.ts`; migration can be done later.
+
 ## 2026-02-17 - Config files to TypeScript for consistency
 
 - Summary:
