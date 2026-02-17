@@ -16,11 +16,14 @@
   "dependencies": {
     "@collabboard/shared": "workspace:*",
     "@prisma/client": "^6.1.0",
+    "clsx": "^2.1.1",
     "jose": "^6.1.3",
     "next": "^15.0.0",
     "next-auth": "^4.24.11",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "socket.io-client": "^4.8.3",
+    "tailwind-merge": "^3.4.1"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.3",
