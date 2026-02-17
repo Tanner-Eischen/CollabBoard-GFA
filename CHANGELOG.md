@@ -18,6 +18,21 @@ Project decision and progress log. Update this file on every commit.
   - <what to repeat/avoid next time>
 ```
 
+## 2026-02-17 - Task 8: Authentication Implementation
+
+- Summary:
+  - NextAuth.js with Google OAuth, JWT session strategy, user create/update on first login.
+  - SignInButton, AuthProvider, signin page, dashboard page with session check.
+  - Backend auth middleware validates Bearer token (apiToken from session); session helpers and anon session endpoint (Redis).
+  - AGENTS.md: commits/PRs must be authored under repo owner identity.
+- Decisions:
+  - JWT strategy for NextAuth (no DB adapter); session callback adds apiToken (HS256) for backend API calls.
+  - Anonymous session stored in Redis (session:anon:{id}) with 24h TTL.
+- Mistakes/Fixes:
+  - ioredis v5 ESM + TypeScript nodenext "not constructable" workaround: use require().
+- Lessons Learned:
+  - Cross-origin: frontend (Vercel) and backend (Render) require explicit token in Authorization header.
+
 ## 2026-02-17 - Task 7: Database Schema & Prisma Setup
 
 - Summary:
