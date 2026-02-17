@@ -18,6 +18,18 @@ Project decision and progress log. Update this file on every commit.
   - <what to repeat/avoid next time>
 ```
 
+## 2026-02-17 - Task 11: Frontend Foundation
+
+- Summary:
+  - Added lib/api/client.ts, lib/socket/client.ts, lib/utils/cn.ts; Button, Input, Toast, Header; Providers (Auth + Toast).
+  - Landing page with Header and sign in; dashboard redirects to signin when unauthenticated.
+- Decisions:
+  - Vitest esbuild jsx: "automatic" for React 18; path alias @ for tests.
+- Mistakes/Fixes:
+  - React not defined in Vitest: added esbuild jsx automatic; Input empty interface → type.
+- Lessons Learned:
+  - Next.js uses automatic JSX; Vitest defaults to classic; align with esbuild config.
+
 ## 2026-02-17 - Task 10: WebSocket Server Setup
 
 - Summary:
