@@ -2,9 +2,9 @@ import { redirect } from "next/navigation";
 import { getE2ESession } from "@/lib/auth/e2eSession";
 
 export default async function DashboardPage() {
-  const e2eSession = await getE2ESession();
-  const session = e2eSession
-    ? e2eSession
+  const isE2EMode = process.env.E2E_AUTH_ENABLED === "true";
+  const session = isE2EMode
+    ? await getE2ESession()
     : await (async () => {
         const [{ getServerSession }, { authOptions }] = await Promise.all([
           import("next-auth"),

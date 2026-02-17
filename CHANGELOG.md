@@ -267,6 +267,8 @@ Project decision and progress log. Update this file on every commit.
   - Fix: switched CI E2E command to `pnpm --filter e2e test:e2e` to run Playwright directly.
   - Mistake: dashboard imported `authOptions` eagerly, which loaded Prisma paths during CI E2E.
   - Fix: switched dashboard auth resolution to lazy dynamic imports when E2E session is not present.
+  - Mistake: in E2E mode with no cookie, dashboard still attempted NextAuth import path.
+  - Fix: bypassed NextAuth entirely in E2E mode and redirected unauthenticated test sessions to `/signin`.
 - Lessons Learned:
   - For CI reliability, isolate test auth from provider callbacks and database-dependent auth flows.
 
