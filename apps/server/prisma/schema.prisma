@@ -1,0 +1,96 @@
+// prisma/schema.prisma
+// CollabBoard database schema - matches ARCHITECTURE.md specification
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// User & Authentication
+// ============================================================================
+
+model User {
+  id         String   @id @default(uuid())
+  email      String   @unique
+  name       String
+  avatarUrl  String?
+  provider   String   // 'google'
+  providerId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  boards   Board[]
+  sessions Session[]
+
+  @@index([email])
+  @@index([provider, providerId])
+  @@map("users")
+}
+
+model Session {
+  id          String   @id @default(uuid())
+  boardId     String
+  displayName String
+  cursorColor String
+  lastActive  DateTime @default(now())
+  createdAt  DateTime @default(now())
+
+  // Relations (anonymous sessions keep userId null)
+  user   User?  @relation(fields: [userId], references: [id])
+  userId String?
+  board  Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
+
+  @@index([boardId])
+  @@map("sessions")
+}
+
+// ============================================================================
+// Board & Objects
+// ============================================================================
+
+model Board {
+  id        String   @id @default(uuid())
+  name      String   @default("Untitled Board")
+  shareLink String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  owner   User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId String
+  objects Object[]
+  sessions Session[]
+
+  @@index([ownerId])
+  @@index([shareLink])
+  @@map("boards")
+}
+
+model Object {
+  id        String   @id @default(uuid())
+  type      String   // 'sticky' | 'rectangle' | 'circle' | 'line' | 'connector' | 'text' | 'frame'
+  data      Json     // Type-specific properties (JSONB)
+  x         Float    @default(0)
+  y         Float    @default(0)
+  width     Float?
+  height    Float?
+  rotation  Float    @default(0)
+  zIndex    Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  board   Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  boardId String
+
+  @@index([boardId])
+  @@index([boardId, type])
+  @@index([boardId, zIndex])
+  @@map("objects")
+}

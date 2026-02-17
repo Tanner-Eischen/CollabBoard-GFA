@@ -16,4 +16,4 @@ RUN pnpm --filter server build
 ENV NODE_ENV=production
 EXPOSE 3001
 
-CMD ["pnpm", "--filter", "server", "start"]
+CMD ["sh", "-c", "pnpm --filter server exec prisma migrate deploy && pnpm --filter server start"]

@@ -13,12 +13,33 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: collabboard
+          POSTGRES_PASSWORD: collabboard
+          POSTGRES_DB: collabboard
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Node and pnpm
         uses: ./.github/actions/setup
+
+      - name: Setup DATABASE_URL
+        run: |
+          echo "DATABASE_URL=postgresql://collabboard:collabboard@localhost:5432/collabboard" >> $GITHUB_ENV
+
+      - name: Run migrations
+        run: pnpm --filter server exec prisma migrate deploy
 
       - name: Lint
         run: pnpm turbo lint
