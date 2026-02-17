@@ -18,6 +18,90 @@ Project decision and progress log. Update this file on every commit.
   - <what to repeat/avoid next time>
 ```
 
+## 2026-02-17 - CI: add prisma generate before type-check
+
+- Summary:
+  - Added `prisma generate` step to CI before type-check so @prisma/client exports PrismaClient.
+- Mistakes/Fixes:
+  - CI type-check failed with "Module '@prisma/client' has no exported member 'PrismaClient'" because client was not generated before tsc.
+- Lessons Learned:
+  - prisma migrate deploy does not run prisma generate; type-check needs the generated client.
+
+## 2026-02-17 - Non-negotiable per-task workflow, .dockerignore, Dockerfile fix for Render
+
+- Summary:
+  - Added per-task workflow to AGENTS.md §0 Non-negotiables: create PR → run checks → merge; on deployment failure, find root cause, document in CHANGELOG, fix.
+  - Added .dockerignore to reduce Docker build context (node_modules, .next, e2e, etc.) for faster Render deploys.
+  - Fixed Dockerfile: COPY . . was overwriting node_modules created by pnpm install; reordered to copy source first, then install.
+  - Added deployment-failure troubleshooting to Infra/DevOps agent rules.
+- Decisions:
+  - .dockerignore mirrors .gitignore plus .git, e2e, *.md (except README) to keep build context small.
+- Mistakes/Fixes:
+  - Docker build failed with "Cannot find module prisma/build/index.js": COPY . . ran after pnpm install and overwrote apps/server, removing node_modules. Fix: copy source before install.
+- Lessons Learned:
+  - Render Docker builds use repo root as context; without .dockerignore, node_modules causes huge context. COPY order matters when .dockerignore excludes node_modules.
+
+## 2026-02-17 - Enforce single author, strip Co-authored-by
+
+- Summary:
+  - Added .git/hooks/prepare-commit-msg to strip Co-authored-by trailers from commit messages.
+  - Strengthened AGENTS.md: single author only, never add Co-authored-by.
+- Decisions:
+  - Hook runs on every commit; perl one-liner removes Co-authored-by lines case-insensitively.
+- Mistakes/Fixes:
+  - none this commit
+- Lessons Learned:
+  - Cursor may add Co-authored-by despite settings; hook provides a safety net.
+
+## 2026-02-17 - Task 11: Frontend Foundation
+
+- Summary:
+  - Added lib/api/client.ts, lib/socket/client.ts, lib/utils/cn.ts; Button, Input, Toast, Header; Providers (Auth + Toast).
+  - Landing page with Header and sign in; dashboard redirects to signin when unauthenticated.
+- Decisions:
+  - Vitest esbuild jsx: "automatic" for React 18; path alias @ for tests.
+- Mistakes/Fixes:
+  - React not defined in Vitest: added esbuild jsx automatic; Input empty interface → type.
+- Lessons Learned:
+  - Next.js uses automatic JSX; Vitest defaults to classic; align with esbuild config.
+
+## 2026-02-17 - Task 10: WebSocket Server Setup
+
+- Summary:
+  - Socket.io server attached to Express HTTP server; CORS, Redis adapter (ioredis), auth middleware.
+  - Connection/disconnect logging; ping/pong via Socket.IO defaults (25s/20s).
+- Decisions:
+  - Auth via handshake.auth.token or Authorization header; JWT validation same as REST.
+- Mistakes/Fixes:
+  - Vitest afterAll uses async/Promise, not done callback; fixed socket-connection test.
+- Lessons Learned:
+  - @socket.io/redis-adapter works with ioredis; use redis.duplicate() for sub client.
+
+## 2026-02-17 - Task 9: API Foundation & Middleware
+
+- Summary:
+  - Added rate limiting (express-rate-limit), error handler, Zod validation middleware.
+  - Created lib/validators/board.ts and object.ts; routes/boards.ts and objects.ts (stub structure).
+  - Validation runs before auth to avoid unnecessary auth overhead; error handler returns consistent JSON.
+- Decisions:
+  - Rate limit: 100 req/15min per IP; validate-then-auth order per task edge cases.
+- Mistakes/Fixes:
+  - Fixed Router type inference (express.Router) for portable build; removed unused test imports.
+- Lessons Learned:
+  - express-rate-limit v7 uses different API; use direct import for test-specific config.
+
+## 2026-02-17 - Task delegation: branch/PR templates and guardrails
+
+- Summary:
+  - Added `.github/PULL_REQUEST_TEMPLATE.md` with acceptance-criteria checklist and verification steps.
+  - Added AGENTS.md §2.5 Task delegation: branch naming (`task-<n>-<slug>`), PR title (`Task <n>: <title>`), commit author policy.
+- Decisions:
+  - PR template lives in `.github/` for GitHub auto-fill; AGENTS.md documents naming for human/AI agents.
+- Mistakes/Fixes:
+  - none this commit
+- Lessons Learned:
+  - Explicit naming guardrails reduce drift when multiple agents work in parallel.
+
 ## 2026-02-17 - Task 8: Authentication Implementation
 
 - Summary:
