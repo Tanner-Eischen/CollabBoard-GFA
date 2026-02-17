@@ -90,7 +90,7 @@ jobs:
       - name: Generate Prisma client
         run: pnpm --filter server exec prisma generate
 
-      - name: Install Playwright browsers
+      - name: Install Playwright browser
         run: pnpm --filter e2e exec playwright install --with-deps chromium
 
       - name: E2E tests
