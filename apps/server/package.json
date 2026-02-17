@@ -20,6 +20,7 @@
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@collabboard/shared": "workspace:*",
     "@prisma/client": "^6.1.0",
     "@socket.io/redis-adapter": "^8.3.0",
     "cors": "^2.8.6",

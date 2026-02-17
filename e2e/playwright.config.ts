@@ -8,8 +8,12 @@ export default defineConfig({
     headless: true,
   },
   webServer: {
-    command: "pnpm --filter web dev",
+    command:
+      "pnpm --filter web exec prisma generate --schema=../server/prisma/schema.prisma && pnpm --filter web dev",
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
+    env: {
+      E2E_AUTH_ENABLED: "true",
+    },
   },
 });

@@ -1,13 +1,38 @@
 import { expect, test } from "@playwright/test";
+import { clearE2ESession, seedE2ESession } from "../fixtures/test-helpers";
 
-test("sign in page shows Sign in with Google button", async ({ page }) => {
+test("sign in page loads", async ({ page }) => {
   await page.goto("/signin");
+  await expect(page).toHaveURL(/\/signin/);
   await expect(
     page.getByRole("button", { name: /sign in with google/i })
   ).toBeVisible();
 });
 
-test("landing page loads", async ({ page }) => {
+test("protected route redirects when not signed in", async ({ page }) => {
+  await page.goto("/dashboard");
+  await expect(page).toHaveURL(/\/signin/);
+});
+
+test("sign in -> redirect to dashboard", async ({ page }) => {
+  await seedE2ESession(page);
+  await page.goto("/dashboard");
+  await expect(page).toHaveURL(/\/dashboard/);
+  await expect(page.getByText(/signed in as/i)).toBeVisible();
+});
+
+test("sign out -> redirect to landing", async ({ page }) => {
+  await seedE2ESession(page);
+  await page.goto("/dashboard");
+  await expect(page).toHaveURL(/\/dashboard/);
+
+  await clearE2ESession(page);
   await page.goto("/");
   await expect(page).toHaveURL("/");
+  await expect(
+    page.getByRole("heading", { name: /collabboard/i })
+  ).toBeVisible({ timeout: 10000 });
+
+  await page.goto("/dashboard");
+  await expect(page).toHaveURL(/\/signin/);
 });
