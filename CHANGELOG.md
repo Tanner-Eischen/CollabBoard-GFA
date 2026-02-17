@@ -18,6 +18,18 @@ Project decision and progress log. Update this file on every commit.
   - <what to repeat/avoid next time>
 ```
 
+## 2026-02-17 - Task 9 CI dependency fix (zod, express-rate-limit)
+
+- Summary:
+  - Added missing server dependencies required by Task 9 runtime files: `zod` and `express-rate-limit`.
+  - Updated lockfile to ensure CI resolves validation and rate-limit imports during type-check.
+- Decisions:
+  - Kept dependency additions scoped to `apps/server` to avoid unrelated workspace churn.
+- Mistakes/Fixes:
+  - CI failed for Task 9 with missing module errors; fixed by adding dependencies via pnpm in the server package.
+- Lessons Learned:
+  - Local success can mask missing dependency declarations when packages exist transitively; CI type-check is the definitive dependency gate.
+
 ## 2026-02-17 - Task 9: API Foundation runtime wiring and tests
 
 - Summary:
