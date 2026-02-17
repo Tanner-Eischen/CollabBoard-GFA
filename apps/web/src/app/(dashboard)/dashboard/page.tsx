@@ -1,9 +1,10 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/authOptions";
 import { redirect } from "next/navigation";
+import { getE2ESession } from "@/lib/auth/e2eSession";
 
 export default async function DashboardPage() {
-  const session = await getServerSession(authOptions);
+  const session = (await getE2ESession()) ?? (await getServerSession(authOptions));
 
   if (!session) {
     redirect("/signin");
