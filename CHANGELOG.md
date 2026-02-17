@@ -263,6 +263,8 @@ Project decision and progress log. Update this file on every commit.
 - Mistakes/Fixes:
   - Mistake: initially introduced an extra test auth provider in NextAuth options.
   - Fix: removed provider injection and kept a simpler cookie-based E2E fixture path.
+  - Mistake: CI E2E job initially used `pnpm turbo test:e2e`, which pulled in `web#build`.
+  - Fix: switched CI E2E command to `pnpm --filter e2e test:e2e` to run Playwright directly.
 - Lessons Learned:
   - For CI reliability, isolate test auth from provider callbacks and database-dependent auth flows.
 
