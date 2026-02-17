@@ -18,6 +18,18 @@ Project decision and progress log. Update this file on every commit.
   - <what to repeat/avoid next time>
 ```
 
+## 2026-02-17 - Tasks 1-11 checklist status sync in tasks.md
+
+- Summary:
+  - Updated Task 1-11 acceptance checkboxes in `tasks.md` to reflect merged implementation progress.
+  - Marked externally-verified platform items (Vercel/Render/branch protection/manual infra checks) as pending where repository state alone cannot confirm completion.
+- Decisions:
+  - Keep external platform criteria unchecked unless directly verifiable from repository and CI evidence.
+- Mistakes/Fixes:
+  - none this commit
+- Lessons Learned:
+  - Keeping task checklists synchronized with merged PR outcomes reduces ambiguity and makes planning/verification faster.
+
 ## 2026-02-17 - Task 11: Frontend foundation completion and tests
 
 - Summary:
