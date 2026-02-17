@@ -31,4 +31,10 @@ test("sign out -> redirect to landing", async ({ page }) => {
 
   await page.goto("/");
   await expect(page).toHaveURL("/");
+  await expect(
+    page.getByRole("heading", { name: /collabboard/i })
+  ).toBeVisible({ timeout: 10000 });
+
+  await page.goto("/dashboard");
+  await expect(page).toHaveURL(/\/signin/);
 });

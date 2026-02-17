@@ -4,6 +4,8 @@ import { Server } from "socket.io";
 import { redis } from "../lib/redis.js";
 import { socketAuthMiddleware } from "./auth.js";
 import { registerConnectionHandlers } from "./connection.js";
+import { registerBoardHandlers } from "./board.js";
+import { registerCursorHandlers } from "./cursor.js";
 
 const allowedOrigins = [process.env.FRONTEND_URL, "http://localhost:3000"].filter(
   (origin): origin is string => Boolean(origin?.trim())
@@ -27,6 +29,8 @@ export function createSocketServer(httpServer: HttpServer): Server {
 
   io.use(socketAuthMiddleware);
   registerConnectionHandlers(io);
+  registerBoardHandlers(io);
+  registerCursorHandlers(io);
 
   return io;
 }

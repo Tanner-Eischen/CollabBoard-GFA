@@ -1,8 +1,8 @@
-import express, { Router } from "express";
+import { Router } from "express";
 import { randomUUID } from "crypto";
 import { redis } from "../lib/redis.js";
 
-const router: express.Router = Router();
+const router: Router = Router();
 
 const CURSOR_COLORS = [
   "#ef4444",

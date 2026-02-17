@@ -12,5 +12,9 @@ export const boardIdParamSchema = z.object({
   id: z.string().uuid(),
 });
 
+export const shareLinkParamSchema = z.object({
+  shareLink: z.string().min(1).max(64).regex(/^[A-Za-z0-9_-]+$/),
+});
+
 export type CreateBoardInput = z.infer<typeof createBoardSchema>;
 export type UpdateBoardInput = z.infer<typeof updateBoardSchema>;

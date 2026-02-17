@@ -33,3 +33,19 @@ export function validateParams<T extends z.ZodType>(schema: T) {
     next(err);
   };
 }
+
+export function validateQuery<T extends z.ZodType>(schema: T) {
+  return (req: Request, _res: Response, next: NextFunction): void => {
+    const result = schema.safeParse(req.query);
+    if (result.success) {
+      req.query = result.data as Record<string, string>;
+      next();
+      return;
+    }
+
+    const err = new Error("Validation failed") as ApiError;
+    err.statusCode = 400;
+    err.details = result.error.flatten();
+    next(err);
+  };
+}

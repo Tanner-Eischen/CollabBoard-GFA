@@ -12,7 +12,8 @@ async function start(): Promise<void> {
     await verifyRedisConnection();
 
     const httpServer = createServer(app);
-    createSocketServer(httpServer);
+    const io = createSocketServer(httpServer);
+    app.set("io", io);
 
     httpServer.listen(PORT, () => {
       console.log(`Server listening on http://localhost:${PORT}`);

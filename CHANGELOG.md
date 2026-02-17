@@ -2,6 +2,33 @@
 
 Project decision and progress log. Update this file on every commit.
 
+## 2026-02-17 - CI e2e command isolation for reliable merges
+
+- Summary:
+  - Updated CI e2e job to run `pnpm --filter e2e test:e2e` instead of `pnpm turbo test:e2e`.
+  - This avoids pulling `web#build` into the e2e pipeline and keeps Playwright checks scoped to the E2E package.
+- Decisions:
+  - Preserve the existing validate job as the single place for full build verification and keep e2e focused on runtime integration tests.
+- Mistakes/Fixes:
+  - Mistake: e2e CI previously failed due to unrelated `web#build` artifacts during turbo graph execution.
+  - Fix: constrained the e2e command to the `e2e` workspace filter.
+- Lessons Learned:
+  - Separating build validation from Playwright execution makes check failures easier to diagnose and reduces false-negative PR blocks.
+
+## 2026-02-17 - Quality gates: lint/build fixes
+
+- Summary:
+  - Fixed ESLint unused-variable errors blocking Next.js build: useKeyboardShortcuts (destructuring omit, map index), useDragCreate (CreateObjectInput), history.test.ts (HISTORY_CAP, HistoryEntry).
+  - Created missing LeftPanel component (wrapper around ObjectLibrary for board page drag-create).
+  - All quality gates pass: lint, type-check, test, build, test:e2e.
+- Decisions:
+  - Scope limited to straightforward fixes; no major rewrites.
+- Mistakes/Fixes:
+  - none this commit
+- Lessons Learned:
+  - Next.js build runs stricter ESLint than standalone `pnpm lint`; test files are included.
+  - LeftPanel was referenced but not implemented; ObjectLibrary existed but needed panel wrapper.
+
 ## Entry Template
 
 ```
@@ -17,6 +44,238 @@ Project decision and progress log. Update this file on every commit.
 - Lessons Learned:
   - <what to repeat/avoid next time>
 ```
+
+## 2026-02-17 - Task 28: Undo/Redo System
+
+- Summary:
+  - Added `apps/web/src/lib/history.ts`: HISTORY_CAP (50), pushWithCap, computeAfterState, HistoryEntry types.
+  - Added `apps/web/src/stores/historyStore.ts`: per-user local undo/redo stacks, recordCreate/recordUpdate/recordDelete/recordDeleteMany, undo/redo, setBoardId/clear on board change.
+  - Added `apps/web/src/hooks/useUndoRedo.ts`: hook exposing undo, redo, canUndo, canRedo, updateObject, removeObject, removeObjects, recordCreate.
+  - Integrated: useTransform, useProperties, CanvasContent, useKeyboardShortcuts, useDragCreate use recordUpdate/recordDeleteMany/recordCreate instead of objectStore directly.
+  - Keyboard shortcuts: Ctrl+Z (undo), Ctrl+Shift+Z / Ctrl+Y (redo), Delete/Backspace (delete selected) in useKeyboardShortcuts.
+  - Board page: setHistoryBoardId on board change; cleanup on unmount.
+  - offlineQueue flush: recordCreate for created objects.
+  - Tests: history.test.ts (5), historyStore.test.ts (8); updated useTransform, useProperties, useDragCreate, useKeyboardShortcuts, LeftPanel, ObjectLibrary tests.
+- Decisions:
+  - Per-board history scope: history cleared when boardId changes; recordUpdate/recordDelete no-op when boardId mismatch.
+  - 50-action cap on undo stack; redo stack cleared on new action.
+  - recordUpdate both records and applies; single source of truth for undoable updates.
+- Mistakes/Fixes:
+  - useTransform/useProperties tests failed: recordUpdate no-ops when historyStore.boardId is null; added setBoardId in beforeEach.
+  - useDragCreate test: useHistoryStore not mocked; added vi.mock for historyStore with recordCreate.
+  - LeftPanel test: missing onDragCreate prop; added mockHandlers.
+  - ObjectLibrary test: fireEvent not imported; added to @testing-library/react import.
+- Lessons Learned:
+  - Hooks that depend on historyStore need boardId set in tests; centralize beforeEach setup.
+  - Mock useHistoryStore when testing hooks that use it without needing full history behavior.
+
+## 2026-02-17 - Task 22: Connection Resilience
+
+- Summary:
+  - Socket client: exponential backoff reconnect (reconnectionDelay 1s, reconnectionDelayMax 30s).
+  - useSocket: returns { socket, status } with status in connected/reconnecting/offline.
+  - ConnectionStatus.tsx: UI for connection state (green/amber/red dot + label).
+  - offlineQueue.ts: lightweight queue for object create/update/delete; flush(token) runs queued ops in order.
+  - syncState.ts: tracks lastSynced per object to avoid re-syncing socket-received updates; isDirty for change detection.
+  - useObjectSync: subscribes to objectStore, debounces 500ms; when online syncs via API, when offline enqueues.
+  - useOfflineQueueFlush: flushes queue when status transitions to connected.
+  - useBoardObjects: marks objects as synced when received from socket (objects:list, object:created/updated/deleted).
+  - Board page: ConnectionStatus, useObjectSync, useOfflineQueueFlush wired.
+  - Tests: offlineQueue (5), syncState (5), ConnectionStatus (3), useSocket (3).
+- Decisions:
+  - Socket.IO built-in reconnection with config; no custom backoff logic.
+  - Queue stores operation descriptors; flush calls REST API directly (no socket emit for object ops).
+  - syncState module-level to share between useBoardObjects and useObjectSync; clearAllSynced in test beforeEach.
+- Mistakes/Fixes:
+  - useSocket initially returned Socket | null; changed to { socket, status } - updated board page destructuring.
+  - offlineQueue test: removed unused QueuedOp import (lint).
+- Lessons Learned:
+  - Differentiate reconnecting (was connected, now retrying) vs offline (reconnect failed or manual disconnect).
+  - Mark server-received objects as synced to avoid useObjectSync re-pushing them when online.
+
+## 2026-02-17 - Task 24: Toolbar Implementation
+
+- Summary:
+  - Toolbar: Toolbar.tsx, ToolButton.tsx with core tools (Select, Text, Rectangle, Circle, Line, Connector, Sticky, Frame), active highlighting, tooltips with shortcuts (V, T, R, O, L, C, S, F), collapsible state.
+  - toolStore: extended with TOOL_CONFIGS, TOOL_BY_SHORTCUT for labels/shortcuts; keyboard shortcuts handled in Toolbar useEffect.
+  - Board page: Toolbar integrated top-left; selection cleared when switching away from select tool.
+  - Canvas integration: isSelectMode (activeTool === "select") passed to ObjectRenderer; SelectableObject disables draggable and click-to-select when !isSelectMode; marquee and stage click-clear only when select tool.
+  - Tests: toolStore (TOOL_CONFIGS, TOOL_BY_SHORTCUT), ToolButton (render, active/inactive, onClick), Toolbar (all tools, default select, tool switch, collapse button).
+- Decisions:
+  - Native title attribute for tooltips (simpler than custom tooltip; avoids layout/positioning issues).
+  - Keyboard shortcuts in Toolbar component (no separate useKeyboardShortcuts hook for Task 24; Task 27 will expand).
+  - Collapsed toolbar shows vertical icon strip; expand/collapse button toggles.
+- Mistakes/Fixes:
+  - Removed unused ToolType import from Toolbar.tsx (lint).
+  - Added beforeEach import to Toolbar.test.tsx (type-check: vitest globals not always inferred).
+- Lessons Learned:
+  - Tool selection must gate canvas interaction: SelectableObject draggable and onClick only when select tool; marquee and stage clear likewise.
+  - Clear selection on tool switch (useEffect in board page) avoids stale selection when switching to draw tools.
+
+## 2026-02-17 - Task 23: Conflict Resolution & Optimistic Updates
+
+- Summary:
+  - Added `apps/web/src/lib/optimistic.ts`: LWW helpers (isNewerOrEqual, shouldAcceptServer, reconcileObject), applyOptimisticUpdate for immediate feedback, isObjectDisplayEqual to avoid flicker.
+  - objectStore: updateObject uses applyOptimisticUpdate; added reconcileUpdate for server reconciliation with LWW; skips store write when display-equal to avoid flicker.
+  - useBoardObjects: object:created and object:updated now use reconcileUpdate instead of addObject/updateObject.
+  - SyncService: added isNewerOrEqual for timestamp-based LWW (server authority).
+  - Tests: optimistic.test.ts (14), objectStore (5 new), useBoardObjects (object:updated LWW), SyncService (isNewerOrEqual).
+- Decisions:
+  - Server timestamp (updatedAt) is authoritative; client skips when local is newer (rare, clock skew).
+  - Display-equal check avoids unnecessary store writes when server echoes our own update.
+  - Optimistic create flow (addOptimistic/confirmOptimistic) unchanged; API persistence for updates not yet wired.
+- Mistakes/Fixes:
+  - objectStore originally had updateObject merge logic inline; refactored to use applyOptimisticUpdate for consistent updatedAt.
+  - objectStore tests: reconcileUpdate "adds when not present" needed full server object.
+- Lessons Learned:
+  - LWW with timestamp comparison is simple; clock skew can cause local to reject server—acceptable for rare edge case.
+  - isObjectDisplayEqual avoids flicker when server response matches our optimistic state; compare only render-affecting fields.
+
+## 2026-02-17 - Task 26: Right Panel (Properties)
+
+- Summary:
+  - RightPanel: right-side panel container (280px default) with PropertiesPanel.
+  - PropertiesPanel: selection-aware properties editor; no-selection state shows "Select an object to edit"; single/multi-select shows position (x,y), size (w,h), rotation, color.
+  - ColorPicker: preset swatches + native color input; supports "mixed" state for multi-select with differing colors.
+  - useProperties: hook aggregating selection + object store; returns x, y, width, height, rotation, color (or "mixed"); applyX, applyY, applyWidth, applyHeight, applyRotation, applyColor for immediate store updates.
+  - Integrated RightPanel into board page layout; properties apply via objectStore.updateObject (same as useTransform).
+  - Tests: useProperties (5), ColorPicker (4), PropertiesPanel (3), RightPanel (2).
+  - Fixed objectStore: added missing imports for applyOptimisticUpdate, reconcileObject, isObjectDisplayEqual from @/lib/optimistic.
+- Decisions:
+  - Per-field apply (applyX, applyY, etc.) so multi-select edits update only the changed field across all selected objects.
+  - Color applies to fill/stroke/color based on object type (rectangle/circle/text use fill; line/arrow use stroke; sticky uses color).
+  - Size section shown only when at least one selected object has width/height or is a shape type.
+- Mistakes/Fixes:
+  - objectStore referenced applyOptimisticUpdate, reconcileObject, isObjectDisplayEqual without importing; added import from @/lib/optimistic.
+  - PropertiesPanel NumberInput value type: useProperties returned string | number | null for "mixed"; added Mixedable<T> type for explicit typing.
+- Lessons Learned:
+  - Reuse existing optimistic/reconcile helpers when objectStore evolves; check for missing imports when tests fail with "X is not defined".
+  - Per-field apply avoids overwriting unrelated properties when editing multi-selection.
+
+## 2026-02-17 - Task 19: Real-Time Object Sync
+
+- Summary:
+  - Board join/leave: extended board:join to emit objects:list (initial state) to joining socket; reconnect path re-syncs via same flow.
+  - Object create/update/delete: REST routes broadcast object:created, object:updated, object:deleted to board room with timestamps.
+  - SyncService: toObjectJson, broadcastObjectCreated/Updated/Deleted; routes use getIo(req) from app.set("io").
+  - Client: useBoardObjects hook subscribes to objects:list, object:created/updated/deleted; updates objectStore; integrated in board page.
+  - Shared: ObjectsListPayload, ObjectCreatedPayload, ObjectUpdatedPayload, ObjectDeletedPayload in socket-events.
+  - Tests: SyncService (toObjectJson, broadcast mocks), socket-presence (objects:list on board:join), useBoardObjects (store integration).
+- Decisions:
+  - Fire-and-forget broadcast (no ack) for p95 latency; io.to(room).emit; single DB query for initial sync.
+  - Try/catch around listObjectsByBoardId in board:join so tests pass when DATABASE_URL unset.
+  - object:updated with missing object in store → addObject (handles reorder/race).
+- Mistakes/Fixes:
+  - board.ts imported { SyncService } but SyncService exports functions; fixed to import * as SyncService.
+  - SyncService had unused OBJECTS_LIST constant; removed.
+- Lessons Learned:
+  - Express app.set("io", io) enables routes to broadcast without circular deps; index.ts wires after createSocketServer.
+  - Socket mock in tests: avoid `return this` (implicit any); use named object reference for chaining.
+
+## 2026-02-17 - Task 18: Object Manipulation (Move, Resize, Rotate)
+
+- Summary:
+  - Implemented selection and transform system: selectionStore, useSelection, useTransform, SelectableObject, Transformer, SelectionManager (marquee), useKeyboardNudge.
+  - Single and multi-select: click object to select; Shift+click to add; click empty to deselect; Shift+drag on empty for marquee selection.
+  - Move/resize/rotate via Konva Transformer; drag to move; persist to object store on drag/transform end.
+  - Keyboard nudging (Arrow keys) for selected objects; 8px step; prevents default when selection exists.
+  - Integrated into Canvas/CanvasContent; ObjectRenderer wraps objects in SelectableObject; stage handlers for click/marquee.
+  - Tests: selectionStore (8), useSelection (3), useTransform (4).
+- Decisions:
+  - Marquee requires Shift+drag to avoid conflicting with stage pan.
+  - Objects wrapped in Group at (x,y,rotation); inner content renders at (0,0) for consistent transform.
+  - Transformer handles multi-select; onTransformEnd updates each node via object store.
+- Mistakes/Fixes:
+  - selectionStore tests failed: getState() returns snapshot; use fresh getState() after mutations for assertions.
+  - Stage ref type: use Konva.Stage directly; react-konva Stage ref passes underlying instance.
+  - Konva.Transformer cast in onTransformEnd: use `as unknown as Konva.Transformer` for type safety.
+- Lessons Learned:
+  - Zustand getState() returns current state; store variable from prior getState() is stale after set().
+  - Marquee + pan conflict resolved by modifier key (Shift) for marquee; disable stage draggable when marquee active.
+
+## 2026-02-17 - Tasks 20 & 21: Cursor Presence and User Presence System
+
+- Summary:
+  - Task 20: Cursor presence with throttled (16ms) broadcast per board room. Server: `socket/cursor.ts`, client: `useCursor`, `CursorOverlay` (Konva Layer). Cursor coords in board space; overlay transforms to screen.
+  - Task 21: User presence roster with join/leave updates. Server: `PresenceService`, `socket/board.ts` (board:join, board:leave, user:joined, user:left, users:list). Client: `presenceStore`, `useBoardPresence`, `PresenceIndicator`.
+  - Shared event contracts in `packages/shared/src/types/socket-events.ts`. Added `@collabboard/shared` to server deps.
+  - Tests: presenceStore, PresenceService, socket-presence (board join, user:joined, cursor:move broadcast), PresenceIndicator.
+- Decisions:
+  - In-memory presence per board; Redis-backed presence deferred for multi-server scale.
+  - PresenceService skips Prisma user lookup when DATABASE_URL unset (test env).
+  - Cursor throttle keyed by socketId+boardId; server broadcasts only to others in room.
+- Mistakes/Fixes:
+  - socket-presence cursor test timed out: client2 must receive users:list before client1 emits cursor:move; added await client2Joined.
+  - board.ts/cursor.ts were overwritten with placeholders; restored full implementations.
+- Lessons Learned:
+  - Socket integration tests need explicit sequencing (await join completion) before emitting dependent events.
+  - DATABASE_URL guard avoids Prisma runtime errors in CI when DB not configured.
+
+## 2026-02-17 - Task 17: Object System - Canvas Rendering
+
+- Summary:
+  - Implemented ObjectRenderer and object components (rectangle, circle, text, sticky note, line, arrow, image placeholder) for Konva canvas.
+  - Added useObjects hook for board-scoped object list from object store, sorted by zIndex.
+  - Integrated ObjectRenderer into Canvas/CanvasLayer; board page sets boardId in object store and passes it to Canvas.
+  - Added getObjectsByBoardIdFromMap helper for hooks that select objects only.
+  - Added vitest-canvas-mock for Konva tests; tests for useObjects and ObjectRenderer.
+  - Created useCursor hook (was missing) and fixed CursorOverlay Konva event typing.
+- Decisions:
+  - Object types map: rectangle, circle, text, sticky, line, arrow, connector→arrow, image/image-placeholder.
+  - Each object component is modular; ObjectRenderer dispatches by type with memo for performance.
+  - useObjects accepts optional boardId; falls back to store boardId when undefined.
+- Mistakes/Fixes:
+  - getObjectsByBoardId required full ObjectState; added getObjectsByBoardIdFromMap for objects-only use.
+  - ObjectRenderer test makeObject overrides needed x, y in type for multi-type test.
+  - useCursor was imported but missing; created hook. CursorOverlay event type used overly specific shape; switched to Konva.Stage | null.
+- Lessons Learned:
+  - vitest-canvas-mock enables Konva/Stage tests in jsdom. Zustand selectors returning new objects cause useMemo to re-run every render; prefer primitive/stable selectors.
+
+## 2026-02-17 - Task 14: Dashboard UI on Task 13 APIs
+
+- Summary:
+  - Implemented dashboard UI: board list with loading/empty/error states, create board flow, delete board flow (modal confirmation), share link copy affordance.
+  - Added `useBoards` hook, `BoardCard`, `BoardList`, `NewBoardButton`, `DeleteBoardModal`, `DashboardContent`; updated dashboard page and layout (Header).
+  - Auth redirect to `/signin` when unauthenticated preserved.
+  - Added component tests for BoardList, BoardCard, DeleteBoardModal, NewBoardButton, useBoards.
+- Decisions:
+  - Share URL format: `${origin}/share/${shareLink}` for future share route; copy affordance on each card.
+  - ToastProvider required in BoardList test when rendering success state (BoardCard uses useToast).
+- Mistakes/Fixes:
+  - BoardList "renders board cards when success" failed with "useToast must be used within ToastProvider"; fixed by wrapping render with ToastProvider.
+- Lessons Learned:
+  - Components that use context (ToastProvider) need corresponding wrappers in tests when rendered indirectly (e.g. via BoardList → BoardCard).
+
+## 2026-02-17 - Integration/quality orchestrator: wave gate config fixes
+
+- Summary:
+  - Fixed lint blockers: removed unused `express` imports from server routes (boards, objects, anon, index); added `Request`/`Response` types to objects handler.
+  - Fixed type-check blockers: `req.params` string coercion in boards routes; `BoardService` now uses `import type` for `BoardRecord`/`CreateResult` to resolve circular reference.
+  - Wave gate commands identified: `pnpm turbo lint`, `pnpm turbo type-check`, `pnpm turbo build`, `pnpm turbo test`, `pnpm turbo test:e2e` (CI e2e job).
+- Decisions:
+  - Scope limited to script wiring and package references; no feature behavior changes to avoid duplicating Tasks 12/13/15.
+  - `String(req.params.id ?? "")` used for param coercion to satisfy Express `string | string[]` typing.
+- Mistakes/Fixes:
+  - none this commit
+- Lessons Learned:
+  - `import type` for repository types breaks circular reference that caused "declares locally but not exported" errors when using namespace imports.
+
+## 2026-02-17 - Task 12: Basic E2E test (auth flow)
+
+- Summary:
+  - Added Playwright E2E tests for auth flow: `e2e/tests/auth.spec.ts` (sign-in page, protected redirect, sign-in→dashboard, sign-out→landing) and `e2e/tests/home.spec.ts` (landing page load).
+  - Created `e2e/fixtures/test-helpers.ts` with `seedE2ESession` and `clearE2ESession` for CI-safe cookie-based auth.
+  - Updated `e2e/playwright.config.ts` to set `E2E_AUTH_ENABLED=true` for webServer and to run `prisma generate` before `next dev`.
+  - Wired `authOptions` signIn callback to skip DB for E2E provider.
+  - Added E2E job to CI workflow with Postgres, migrations, and Playwright Chromium.
+- Decisions:
+  - Use seeded test session cookie (`/api/test-auth/signin`, `/api/test-auth/signout`) instead of live Google OAuth in CI; test-only toggles via `E2E_AUTH_ENABLED` env.
+  - Run `prisma generate` in webServer command so dev server has Prisma client when E2E tests start.
+- Mistakes/Fixes:
+  - Initial run failed with "Cannot find module '.prisma/client/default'" because `next dev` started without Prisma client; fixed by adding `prisma generate` to webServer command.
+  - Landing page test expected `getByRole("link", { name: /sign in/i })`; switched to `getByRole("button", { name: /sign in/i })` to match Header structure.
+- Lessons Learned:
+  - E2E webServer must ensure Prisma client exists before starting Next.js dev; turbo build runs generate for production but dev uses source directly.
 
 ## 2026-02-17 - Tasks 1-11 checklist status sync in tasks.md
 
