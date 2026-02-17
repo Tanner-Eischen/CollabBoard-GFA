@@ -19,3 +19,8 @@ export const prisma =
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
 }
+
+export async function verifyPrismaConnection(): Promise<void> {
+  await prisma.$queryRaw`SELECT 1`;
+  console.log("Connected to PostgreSQL");
+}
