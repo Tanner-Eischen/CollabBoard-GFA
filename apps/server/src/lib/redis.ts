@@ -10,3 +10,8 @@ export const redis = new Redis(redisUrl, {
     return Math.min(times * 100, 3000);
   },
 });
+
+export async function verifyRedisConnection(): Promise<void> {
+  await redis.ping();
+  console.log("Connected to Redis");
+}

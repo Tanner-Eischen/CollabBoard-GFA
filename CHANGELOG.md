@@ -18,6 +18,18 @@ Project decision and progress log. Update this file on every commit.
   - <what to repeat/avoid next time>
 ```
 
+## 2026-02-17 - Task 5: Startup DB/Redis connectivity verification
+
+- Summary:
+  - Added explicit startup connectivity checks for PostgreSQL and Redis before the server begins listening.
+  - Added runtime success logs: "Connected to PostgreSQL" and "Connected to Redis" to satisfy Task 5 verification evidence.
+- Decisions:
+  - Fail fast on startup if either dependency is unavailable to avoid partial service boot with hidden runtime failures.
+- Mistakes/Fixes:
+  - none this commit
+- Lessons Learned:
+  - Verifiable startup health criteria are easier to enforce when connectivity checks are part of the boot sequence, not implicit side effects.
+
 ## 2026-02-17 - CI: add prisma generate before type-check
 
 - Summary:
