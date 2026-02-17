@@ -7,6 +7,8 @@ This repository is **CollabBoard**: a production-grade collaborative whiteboard 
 
 Use this file as the operating manual for human and AI agents working in the repo.
 
+**Commits and PRs must be authored under the repository owner's username and email** (from `git config user.name` and `git config user.email`). Use `git commit --author="..."` when needed to ensure correct attribution.
+
 ---
 
 ## 0) Non-negotiables (project invariants)

@@ -1,9 +1,10 @@
-import type { Metadata } from 'next';
-import './globals.css';
+import type { Metadata } from "next";
+import { AuthProvider } from "@/components/auth/AuthProvider";
+import "./globals.css";
 
 export const metadata: Metadata = {
-  title: 'CollabBoard',
-  description: 'Collaborative whiteboard',
+  title: "CollabBoard",
+  description: "Collaborative whiteboard",
 };
 
 export default function RootLayout({
@@ -13,7 +14,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }
