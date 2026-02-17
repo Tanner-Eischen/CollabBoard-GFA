@@ -253,3 +253,22 @@ Project decision and progress log. Update this file on every commit.
 - Lessons Learned:
   - Playwright browser binaries must be explicitly installed before first `test:e2e` run in fresh environments.
 
+## 2026-02-17 - Task 12: CI-safe E2E auth session fixture
+
+- Summary:
+  - Added test-only auth session helpers and API routes so E2E can sign in/sign out without live OAuth.
+  - Updated dashboard session resolution to accept seeded E2E session cookies when `E2E_AUTH_ENABLED=true`.
+- Decisions:
+  - Kept production auth flow unchanged and gated all E2E auth behavior behind an environment flag.
+- Mistakes/Fixes:
+  - Mistake: initially introduced an extra test auth provider in NextAuth options.
+  - Fix: removed provider injection and kept a simpler cookie-based E2E fixture path.
+  - Mistake: CI E2E job initially used `pnpm turbo test:e2e`, which pulled in `web#build`.
+  - Fix: switched CI E2E command to `pnpm --filter e2e test:e2e` to run Playwright directly.
+  - Mistake: dashboard imported `authOptions` eagerly, which loaded Prisma paths during CI E2E.
+  - Fix: switched dashboard auth resolution to lazy dynamic imports when E2E session is not present.
+  - Mistake: in E2E mode with no cookie, dashboard still attempted NextAuth import path.
+  - Fix: bypassed NextAuth entirely in E2E mode and redirected unauthenticated test sessions to `/signin`.
+- Lessons Learned:
+  - For CI reliability, isolate test auth from provider callbacks and database-dependent auth flows.
+
