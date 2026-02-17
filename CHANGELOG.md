@@ -18,6 +18,18 @@ Project decision and progress log. Update this file on every commit.
   - <what to repeat/avoid next time>
 ```
 
+## 2026-02-17 - Task 10: WebSocket Server Setup
+
+- Summary:
+  - Socket.io server attached to Express HTTP server; CORS, Redis adapter (ioredis), auth middleware.
+  - Connection/disconnect logging; ping/pong via Socket.IO defaults (25s/20s).
+- Decisions:
+  - Auth via handshake.auth.token or Authorization header; JWT validation same as REST.
+- Mistakes/Fixes:
+  - Vitest afterAll uses async/Promise, not done callback; fixed socket-connection test.
+- Lessons Learned:
+  - @socket.io/redis-adapter works with ioredis; use redis.duplicate() for sub client.
+
 ## 2026-02-17 - Task 9: API Foundation & Middleware
 
 - Summary:
