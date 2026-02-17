@@ -1,32 +1,25 @@
 import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth/authOptions";
-import { SignInButton } from "@/components/auth/SignInButton";
+import { Header } from "@/components/layout/Header";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    return (
-      <main className="flex min-h-screen flex-col items-center justify-center bg-gray-50">
-        <div className="flex flex-col items-center gap-4">
-          <h1 className="text-2xl font-semibold text-gray-900">
-            Sign in to view your boards
-          </h1>
-          <SignInButton />
-        </div>
-      </main>
-    );
+    redirect("/signin");
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-gray-50">
-      <div className="flex flex-col items-center gap-4">
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      <main className="flex flex-col items-center justify-center px-4 py-16">
         <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600">
+        <p className="mt-2 text-gray-600">
           Signed in as {session.user?.email ?? session.user?.name}
         </p>
-        <p className="text-sm text-gray-500">User ID: {session.user?.id}</p>
-      </div>
-    </main>
+        <p className="mt-1 text-sm text-gray-500">User ID: {session.user?.id}</p>
+      </main>
+    </div>
   );
 }
