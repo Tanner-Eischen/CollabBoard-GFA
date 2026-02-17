@@ -18,6 +18,18 @@ Project decision and progress log. Update this file on every commit.
   - <what to repeat/avoid next time>
 ```
 
+## 2026-02-17 - Task delegation: branch/PR templates and guardrails
+
+- Summary:
+  - Added `.github/PULL_REQUEST_TEMPLATE.md` with acceptance-criteria checklist and verification steps.
+  - Added AGENTS.md §2.5 Task delegation: branch naming (`task-<n>-<slug>`), PR title (`Task <n>: <title>`), commit author policy.
+- Decisions:
+  - PR template lives in `.github/` for GitHub auto-fill; AGENTS.md documents naming for human/AI agents.
+- Mistakes/Fixes:
+  - none this commit
+- Lessons Learned:
+  - Explicit naming guardrails reduce drift when multiple agents work in parallel.
+
 ## 2026-02-17 - Task 8: Authentication Implementation
 
 - Summary:
