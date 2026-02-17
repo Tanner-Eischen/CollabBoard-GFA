@@ -1,0 +1,9 @@
+{
+  "name": "@collabboard/eslint-config",
+  "version": "0.0.1",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint . --ext .js"
+  }
+}

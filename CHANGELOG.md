@@ -1,0 +1,63 @@
+# CHANGELOG.md
+
+Project decision and progress log. Update this file on every commit.
+
+## Entry Template
+
+```
+## YYYY-MM-DD - <short commit title>
+
+- Summary:
+  - <what changed>
+- Decisions:
+  - <important decision and why>
+- Mistakes/Fixes:
+  - <mistake and fix>
+  - OR: none this commit
+- Lessons Learned:
+  - <what to repeat/avoid next time>
+```
+
+## 2026-02-17 - Config files to TypeScript for consistency
+
+- Summary:
+  - Converted next.config.js, tailwind.config.js, postcss.config.js to .ts equivalents.
+  - Fixed server package.json trailing comma (JSON parse error).
+  - Added explicit Express type annotation to server app.ts for portable build.
+- Decisions:
+  - Use .ts for all config files in apps/web for consistency with TypeScript codebase.
+- Mistakes/Fixes:
+  - none this commit
+- Lessons Learned:
+  - Next.js 15, Tailwind, and PostCSS all support TypeScript config natively.
+
+## 2026-02-17 - Docs alignment baseline
+
+- Summary:
+  - Aligned architecture/spec/tasks on API ownership and auth model.
+  - Standardized socket conflict-resolution fields for object updates.
+  - Added changelog process requirements across project docs.
+- Decisions:
+  - `ARCHITECTURE.md` is the canonical contract source for REST and socket payloads.
+  - MVP backend auth remains session-cookie based (no bearer-token requirement).
+- Mistakes/Fixes:
+  - Mistake: docs previously mixed Next.js and Express ownership for board/object REST APIs.
+  - Fix: moved board/object REST ownership consistently to `apps/server`.
+- Lessons Learned:
+  - Keep one canonical contract source and make all planning/spec docs mirror it.
+## 2026-02-17 - Phase A foundation implementation (Tasks 2-6)
+
+- Summary:
+  - Added CI pipeline at `.github/workflows/ci.yml` with lint, type-check, build, and unit test jobs on push/PR.
+  - Added deployment scaffolding for Vercel (`apps/web/vercel.json`) and Render (`apps/server/Dockerfile`, `apps/server/render.yaml`).
+  - Added test infrastructure: Vitest configs/tests in web+server and Playwright E2E package with an example passing test.
+  - Added workspace and package-script alignment so `pnpm turbo lint`, `pnpm turbo type-check`, `pnpm turbo build`, `pnpm turbo test`, and `pnpm turbo test:e2e` succeed.
+- Decisions:
+  - Kept config files in TypeScript (`next.config.ts`, `tailwind.config.ts`, `postcss.config.ts`) for consistency with the codebase.
+  - Used a reusable composite GitHub Action (`.github/actions/setup/action.yml`) for Node/pnpm setup and dependency caching.
+- Mistakes/Fixes:
+  - Mistake: initial unit tests required React runtime imports in this Vitest setup.
+  - Fix: added React import in `Placeholder.tsx` and corrected test file extensions/types.
+- Lessons Learned:
+  - Playwright browser binaries must be explicitly installed before first `test:e2e` run in fresh environments.
+
