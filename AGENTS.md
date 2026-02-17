@@ -7,11 +7,17 @@ This repository is **CollabBoard**: a production-grade collaborative whiteboard 
 
 Use this file as the operating manual for human and AI agents working in the repo.
 
-**Commits and PRs must be authored under the repository owner's username and email** (from `git config user.name` and `git config user.email`). Use `git commit --author="..."` when needed to ensure correct attribution.
+**Commits and PRs: single author only.** Use `git commit --author="Tanner Eischen <tannereischen@gmail.com>"`. **NEVER add Co-authored-by, Co-authored-by Cursor, or any co-author trailers** — even if Cursor or another tool suggests it. The `.git/hooks/prepare-commit-msg` hook strips these if they slip through.
+
+**Per-task workflow (non-negotiable):** After every task completion: (1) create a PR, (2) run checks, (3) merge after checks pass. If deployment fails (e.g. Render main-collabboard-server), address it: find root cause, document in CHANGELOG, and fix.
 
 ---
 
 ## 0) Non-negotiables (project invariants)
+
+**Per-task workflow (mandatory)**
+- After every task completion: (1) create a PR, (2) run checks, (3) merge after checks pass.
+- If deployment fails (e.g. Render main-collabboard-server): find root cause, document in CHANGELOG, and fix before proceeding.
 
 **Performance targets**
 - 60 FPS during pan/zoom/object manipulation.
@@ -119,10 +125,11 @@ This project is easiest to execute with specialized agents. If you are a single 
 **Key modules:**
 - `.github/workflows/*`
 - `docker/*`, `apps/server/Dockerfile`, `apps/server/render.yaml`
-- `.env.example`
+- `.env.example`, `.dockerignore`
 **Rules:**
 - “Deployment-first”: main stays deployable; CI must be green.
 - Migrations must be compatible with Render build/deploy flow.
+- **Deployment failure:** If Render (main-collabboard-server) or Vercel deploy fails: (1) reproduce locally (`docker build -f apps/server/Dockerfile .`), (2) identify root cause, (3) document in CHANGELOG, (4) fix before merging.
 
 ### 3.6 QA/Test Agent (Vitest/Playwright)
 **Owns:** unit/integration/E2E coverage, test utilities, load/perf checks  
