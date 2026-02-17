@@ -18,6 +18,15 @@ Project decision and progress log. Update this file on every commit.
   - <what to repeat/avoid next time>
 ```
 
+## 2026-02-17 - CI: add prisma generate before type-check
+
+- Summary:
+  - Added `prisma generate` step to CI before type-check so @prisma/client exports PrismaClient.
+- Mistakes/Fixes:
+  - CI type-check failed with "Module '@prisma/client' has no exported member 'PrismaClient'" because client was not generated before tsc.
+- Lessons Learned:
+  - prisma migrate deploy does not run prisma generate; type-check needs the generated client.
+
 ## 2026-02-17 - Non-negotiable per-task workflow, .dockerignore, Dockerfile fix for Render
 
 - Summary:
