@@ -58,7 +58,14 @@ A change is “done” only when:
 - It does not regress performance targets or real-time behavior.
 - It updates docs if it changes contracts (REST, sockets, types, env vars).
 
-### 2.4 Change log discipline (required each commit)
+### 2.5 Task delegation (branch/PR naming)
+When working from `tasks.md` in parallel or sequentially:
+- **Branch:** `task-<n>-<slug>` (e.g. `task-9-api-foundation`, `task-13-board-crud`)
+- **PR title:** `Task <n>: <title from tasks.md>` (e.g. `Task 9: API Foundation & Middleware`)
+- **PR template:** Use `.github/PULL_REQUEST_TEMPLATE.md`; copy acceptance criteria from the task section and check off.
+- **Commits:** Authored under repo owner (`git config user.name` / `git config user.email`). Use `git commit --author="Name <email>"` when needed.
+
+### 2.6 Change log discipline (required each commit)
 - Every commit must include an entry in `CHANGELOG.md`.
 - Log notable progress, key decisions, mistakes, fixes, and lessons learned.
 - If no mistakes occurred, write `Mistakes/Lessons: none this commit`.

@@ -18,6 +18,31 @@ Project decision and progress log. Update this file on every commit.
   - <what to repeat/avoid next time>
 ```
 
+## 2026-02-17 - Task 9: API Foundation & Middleware
+
+- Summary:
+  - Added rate limiting (express-rate-limit), error handler, Zod validation middleware.
+  - Created lib/validators/board.ts and object.ts; routes/boards.ts and objects.ts (stub structure).
+  - Validation runs before auth to avoid unnecessary auth overhead; error handler returns consistent JSON.
+- Decisions:
+  - Rate limit: 100 req/15min per IP; validate-then-auth order per task edge cases.
+- Mistakes/Fixes:
+  - Fixed Router type inference (express.Router) for portable build; removed unused test imports.
+- Lessons Learned:
+  - express-rate-limit v7 uses different API; use direct import for test-specific config.
+
+## 2026-02-17 - Task delegation: branch/PR templates and guardrails
+
+- Summary:
+  - Added `.github/PULL_REQUEST_TEMPLATE.md` with acceptance-criteria checklist and verification steps.
+  - Added AGENTS.md §2.5 Task delegation: branch naming (`task-<n>-<slug>`), PR title (`Task <n>: <title>`), commit author policy.
+- Decisions:
+  - PR template lives in `.github/` for GitHub auto-fill; AGENTS.md documents naming for human/AI agents.
+- Mistakes/Fixes:
+  - none this commit
+- Lessons Learned:
+  - Explicit naming guardrails reduce drift when multiple agents work in parallel.
+
 ## 2026-02-17 - Task 8: Authentication Implementation
 
 - Summary:
