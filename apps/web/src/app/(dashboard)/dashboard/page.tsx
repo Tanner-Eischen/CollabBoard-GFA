@@ -1,21 +1,12 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/authOptions";
-import { SignInButton } from "@/components/auth/SignInButton";
+import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    return (
-      <main className="flex min-h-screen flex-col items-center justify-center bg-gray-50">
-        <div className="flex flex-col items-center gap-4">
-          <h1 className="text-2xl font-semibold text-gray-900">
-            Sign in to view your boards
-          </h1>
-          <SignInButton />
-        </div>
-      </main>
-    );
+    redirect("/signin");
   }
 
   return (

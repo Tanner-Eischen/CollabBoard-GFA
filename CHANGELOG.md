@@ -18,6 +18,20 @@ Project decision and progress log. Update this file on every commit.
   - <what to repeat/avoid next time>
 ```
 
+## 2026-02-17 - Task 11: Frontend foundation completion and tests
+
+- Summary:
+  - Added frontend foundation modules: `providers/Providers`, UI primitives (`Button`, `Input`, `Toast`), `Header`, API client, socket client, and class utility `cn`.
+  - Updated app wiring so global providers wrap the app and the landing page includes real task-oriented UI with header/sign-in flow.
+  - Updated dashboard behavior to redirect unauthenticated users to `/signin`.
+  - Added frontend tests for `apiClient`, `cn`, `Button`, and `Header` plus Vitest alias/JSX config for stable test resolution.
+- Decisions:
+  - Configured Vitest with `@` alias and automatic JSX runtime to align test runtime behavior with app source imports.
+- Mistakes/Fixes:
+  - Initial new files included duplicate blocks from prior state; rebuilt affected files cleanly and fixed test/runtime alias issues.
+- Lessons Learned:
+  - Keeping test runtime module resolution aligned with Next.js path aliases prevents false negatives in frontend CI.
+
 ## 2026-02-17 - Task 10: WebSocket server setup with auth and lifecycle tests
 
 - Summary:
