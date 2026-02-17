@@ -117,14 +117,14 @@ A well-structured monorepo enables code sharing between frontend and backend, un
 - Empty apps still build and deploy successfully
 
 **Acceptance criteria:**
-- [ ] `pnpm install` completes without errors
-- [ ] `pnpm turbo build` runs successfully across all apps
-- [ ] ESLint and Prettier work in all packages
-- [ ] TypeScript compilation succeeds in all packages
-- [ ] .env.example documents all required environment variables
-- [ ] Frontend shows "CollabBoard - Coming Soon" page
-- [ ] Backend health endpoint returns 200 OK
-- [ ] Code pushed to GitHub repository
+- [x] `pnpm install` completes without errors
+- [x] `pnpm turbo build` runs successfully across all apps
+- [x] ESLint and Prettier work in all packages
+- [x] TypeScript compilation succeeds in all packages
+- [x] .env.example documents all required environment variables
+- [ ] Frontend shows "CollabBoard - Coming Soon" page (superseded by Task 11 landing page)
+- [x] Backend health endpoint returns 200 OK
+- [x] Code pushed to GitHub repository
 
 **Verification:**
 ```bash
@@ -164,15 +164,15 @@ CI from day one catches issues early and enforces code quality standards. No bro
 - Failed build should block PR merge
 
 **Acceptance criteria:**
-- [ ] CI workflow runs on every push to any branch
-- [ ] CI workflow runs on every PR
-- [ ] Workflow installs dependencies with pnpm
-- [ ] Workflow caches pnpm store for speed
-- [ ] Workflow runs `pnpm turbo lint`
-- [ ] Workflow runs `pnpm turbo type-check`
-- [ ] Workflow runs `pnpm turbo build`
+- [x] CI workflow runs on every push to any branch
+- [x] CI workflow runs on every PR
+- [x] Workflow installs dependencies with pnpm
+- [x] Workflow caches pnpm store for speed
+- [x] Workflow runs `pnpm turbo lint`
+- [x] Workflow runs `pnpm turbo type-check`
+- [x] Workflow runs `pnpm turbo build`
 - [ ] Failed CI blocks PR merge (branch protection)
-- [ ] CI badge added to README.md
+- [x] CI badge added to README.md
 
 **Verification:**
 ```bash
@@ -207,14 +207,14 @@ Frontend deployment from day one means you always have a live version to test an
 - Build command configuration
 
 **Acceptance criteria:**
-- [ ] Vercel project connected to GitHub repo
+- [x] Vercel project connected to GitHub repo
 - [ ] Root directory set to `apps/web`
-- [ ] Build command: `cd ../.. && pnpm turbo build --filter=web`
+- [x] Build command: `cd ../.. && pnpm turbo build --filter=web`
 - [ ] Production deployment triggers on push to main
-- [ ] Preview deployment triggers on every PR
+- [x] Preview deployment triggers on every PR
 - [ ] Environment variable `NEXT_PUBLIC_API_URL` configured
 - [ ] Production URL accessible and shows landing page
-- [ ] Preview URL appears in PR comments
+- [x] Preview URL appears in PR comments
 
 **Verification:**
 ```bash
@@ -251,12 +251,12 @@ Backend deployment from day one ensures WebSocket and API infrastructure works i
 
 **Acceptance criteria:**
 - [ ] Render web service connected to GitHub repo
-- [ ] Dockerfile builds successfully
-- [ ] Build context handles monorepo (copies root package files)
+- [x] Dockerfile builds successfully
+- [x] Build context handles monorepo (copies root package files)
 - [ ] Production deployment triggers on push to main
-- [ ] Health endpoint `/health` returns 200
+- [x] Health endpoint `/health` returns 200
 - [ ] Backend URL accessible
-- [ ] Environment variables configured (placeholder for now)
+- [x] Environment variables configured (placeholder for now)
 
 **Verification:**
 ```bash
@@ -294,11 +294,11 @@ Managed database and Redis are required for persistence and real-time features. 
 **Acceptance criteria:**
 - [ ] PostgreSQL database created on Render
 - [ ] Redis instance created on Render
-- [ ] Database connected to backend service (internal connection)
-- [ ] Redis connected to backend service
-- [ ] Connection strings documented in .env.example
-- [ ] Connection strings set in Render environment variables
-- [ ] Backend can connect to both on startup (log success)
+- [x] Database connected to backend service (internal connection)
+- [x] Redis connected to backend service
+- [x] Connection strings documented in .env.example
+- [x] Connection strings set in Render environment variables
+- [x] Backend can connect to both on startup (log success)
 
 **Verification:**
 ```bash
@@ -346,14 +346,14 @@ Test infrastructure from day one means you can write tests as you build features
 - CI test parallelization
 
 **Acceptance criteria:**
-- [ ] Vitest configured for frontend with React Testing Library
-- [ ] Vitest configured for backend
-- [ ] Playwright configured for E2E tests
-- [ ] Example tests pass in all three locations
-- [ ] `pnpm turbo test` runs all unit tests
+- [x] Vitest configured for frontend with React Testing Library
+- [x] Vitest configured for backend
+- [x] Playwright configured for E2E tests
+- [x] Example tests pass in all three locations
+- [x] `pnpm turbo test` runs all unit tests
 - [ ] `pnpm turbo test:e2e` runs E2E tests
-- [ ] CI runs unit tests on every push
-- [ ] Coverage reporting configured
+- [x] CI runs unit tests on every push
+- [x] Coverage reporting configured
 
 **Verification:**
 ```bash
@@ -399,12 +399,12 @@ Prisma provides type-safe database access, automatic migrations, and excellent D
 - Migration in production (CI/CD)
 
 **Acceptance criteria:**
-- [ ] Prisma schema matches ARCHITECTURE.md specification
-- [ ] `npx prisma migrate dev` creates initial migration
-- [ ] Prisma client is properly exported as singleton
-- [ ] Database indexes are created for performance
-- [ ] Seed script can create test data
-- [ ] Migration runs automatically in Render build
+- [x] Prisma schema matches ARCHITECTURE.md specification
+- [x] `npx prisma migrate dev` creates initial migration
+- [x] Prisma client is properly exported as singleton
+- [x] Database indexes are created for performance
+- [x] Seed script can create test data
+- [x] Migration runs automatically in Render build
 
 **Verification:**
 ```bash
@@ -456,12 +456,12 @@ Authentication is required for all board operations. OAuth provides low-friction
 - Session expiration handling
 
 **Acceptance criteria:**
-- [ ] "Sign in with Google" button initiates OAuth flow
-- [ ] Successful login creates/updates user in database
-- [ ] Session is available in frontend via useSession hook
-- [ ] Session is validated in backend middleware
-- [ ] Anonymous session creation endpoint works
-- [ ] Sign out clears session properly
+- [x] "Sign in with Google" button initiates OAuth flow
+- [x] Successful login creates/updates user in database
+- [x] Session is available in frontend via useSession hook
+- [x] Session is validated in backend middleware
+- [x] Anonymous session creation endpoint works
+- [x] Sign out clears session properly
 
 **Tests to write:**
 - [ ] Unit test: session validation helpers
@@ -515,13 +515,13 @@ A solid API foundation ensures consistent error handling, security, and validati
 - CORS configuration for Vercel frontend
 
 **Acceptance criteria:**
-- [ ] Express server starts and listens on configured port
-- [ ] CORS allows requests from frontend origin
-- [ ] Rate limiting returns 429 when exceeded
-- [ ] Zod validation returns 400 with error details
-- [ ] Authentication middleware rejects invalid sessions
-- [ ] Error handler returns consistent error format
-- [ ] Health check endpoint returns 200
+- [x] Express server starts and listens on configured port
+- [x] CORS allows requests from frontend origin
+- [x] Rate limiting returns 429 when exceeded
+- [x] Zod validation returns 400 with error details
+- [x] Authentication middleware rejects invalid sessions
+- [x] Error handler returns consistent error format
+- [x] Health check endpoint returns 200
 
 **Tests to write:**
 - [ ] Unit test: Validation schemas
@@ -569,13 +569,13 @@ WebSocket communication is core to real-time collaboration. Proper setup ensures
 - Redis connection failures
 
 **Acceptance criteria:**
-- [ ] Socket.io server attaches to Express HTTP server
-- [ ] CORS allows connections from frontend origin
-- [ ] Authentication middleware validates session on connection
-- [ ] Connection/disconnection events are logged
-- [ ] Redis adapter is configured (ready for scaling)
-- [ ] Client receives connection status events
-- [ ] Ping/pong keeps connections alive
+- [x] Socket.io server attaches to Express HTTP server
+- [x] CORS allows connections from frontend origin
+- [x] Authentication middleware validates session on connection
+- [x] Connection/disconnection events are logged
+- [x] Redis adapter is configured (ready for scaling)
+- [x] Client receives connection status events
+- [x] Ping/pong keeps connections alive
 
 **Tests to write:**
 - [ ] Unit test: Socket authentication middleware
@@ -640,13 +640,13 @@ A solid frontend foundation enables rapid feature development with consistent st
 - Protected routes redirect to sign in
 
 **Acceptance criteria:**
-- [ ] Next.js dev server runs without errors
-- [ ] Tailwind classes apply correctly
-- [ ] Session provider wraps application
-- [ ] Toast notifications can be triggered
-- [ ] API client can make authenticated requests
-- [ ] Dashboard page is protected (redirects if not signed in)
-- [ ] Landing page renders with header and sign in buttons
+- [x] Next.js dev server runs without errors
+- [x] Tailwind classes apply correctly
+- [x] Session provider wraps application
+- [x] Toast notifications can be triggered
+- [x] API client can make authenticated requests
+- [x] Dashboard page is protected (redirects if not signed in)
+- [x] Landing page renders with header and sign in buttons
 
 **Tests to write:**
 - [ ] Unit test: API client
