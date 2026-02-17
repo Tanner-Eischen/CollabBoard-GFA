@@ -1,6 +1,9 @@
 services:
   - type: web
     name: collabboard-server
+    ipAllowList:
+      - source: 0.0.0.0/0
+        description: public access
     env: docker
     rootDir: .
     dockerfilePath: apps/server/Dockerfile
