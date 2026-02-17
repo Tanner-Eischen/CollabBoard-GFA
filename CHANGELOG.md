@@ -18,6 +18,19 @@ Project decision and progress log. Update this file on every commit.
   - <what to repeat/avoid next time>
 ```
 
+## 2026-02-17 - Task 9: API Foundation & Middleware
+
+- Summary:
+  - Added rate limiting (express-rate-limit), error handler, Zod validation middleware.
+  - Created lib/validators/board.ts and object.ts; routes/boards.ts and objects.ts (stub structure).
+  - Validation runs before auth to avoid unnecessary auth overhead; error handler returns consistent JSON.
+- Decisions:
+  - Rate limit: 100 req/15min per IP; validate-then-auth order per task edge cases.
+- Mistakes/Fixes:
+  - Fixed Router type inference (express.Router) for portable build; removed unused test imports.
+- Lessons Learned:
+  - express-rate-limit v7 uses different API; use direct import for test-specific config.
+
 ## 2026-02-17 - Task delegation: branch/PR templates and guardrails
 
 - Summary:
