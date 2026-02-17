@@ -29,5 +29,6 @@ services:
 
 databases:
   - name: collabboard-postgres
+    plan: free
     databaseName: collabboard
     user: collabboard
