@@ -2,6 +2,19 @@
 
 Project decision and progress log. Update this file on every commit.
 
+## 2026-02-17 - CI e2e command isolation for reliable merges
+
+- Summary:
+  - Updated CI e2e job to run `pnpm --filter e2e test:e2e` instead of `pnpm turbo test:e2e`.
+  - This avoids pulling `web#build` into the e2e pipeline and keeps Playwright checks scoped to the E2E package.
+- Decisions:
+  - Preserve the existing validate job as the single place for full build verification and keep e2e focused on runtime integration tests.
+- Mistakes/Fixes:
+  - Mistake: e2e CI previously failed due to unrelated `web#build` artifacts during turbo graph execution.
+  - Fix: constrained the e2e command to the `e2e` workspace filter.
+- Lessons Learned:
+  - Separating build validation from Playwright execution makes check failures easier to diagnose and reduces false-negative PR blocks.
+
 ## 2026-02-17 - Quality gates: lint/build fixes
 
 - Summary:
