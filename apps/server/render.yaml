@@ -5,7 +5,7 @@ services:
     env: docker
     rootDir: .
     dockerfilePath: apps/server/Dockerfile
-    plan: starter
+    plan: free
     autoDeploy: true
     healthCheckPath: /health
     envVars:
@@ -22,7 +22,7 @@ services:
           property: connectionString
   - type: redis
     name: collabboard-redis
-    plan: starter
+    plan: free
     ipAllowList:
       - source: 0.0.0.0/0
         description: public access
