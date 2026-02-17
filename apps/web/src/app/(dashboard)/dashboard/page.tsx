@@ -1,10 +1,17 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth/authOptions";
 import { redirect } from "next/navigation";
 import { getE2ESession } from "@/lib/auth/e2eSession";
 
 export default async function DashboardPage() {
-  const session = (await getE2ESession()) ?? (await getServerSession(authOptions));
+  const e2eSession = await getE2ESession();
+  const session = e2eSession
+    ? e2eSession
+    : await (async () => {
+        const [{ getServerSession }, { authOptions }] = await Promise.all([
+          import("next-auth"),
+          import("@/lib/auth/authOptions"),
+        ]);
+        return getServerSession(authOptions);
+      })();
 
   if (!session) {
     redirect("/signin");
