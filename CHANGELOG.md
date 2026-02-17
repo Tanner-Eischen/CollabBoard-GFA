@@ -18,6 +18,20 @@ Project decision and progress log. Update this file on every commit.
   - <what to repeat/avoid next time>
 ```
 
+## 2026-02-17 - Task 10: WebSocket server setup with auth and lifecycle tests
+
+- Summary:
+  - Added Socket.IO server modules (`socket/index`, `socket/auth`, `socket/connection`, `socket/types`) with CORS and heartbeat configuration.
+  - Updated server startup to create an HTTP server, attach Socket.IO, and preserve startup DB/Redis checks.
+  - Added WebSocket auth and connection lifecycle tests (`socket-auth.test.ts`, `socket-connection.test.ts`).
+  - Added Task 10 dependencies to server package (`socket.io`, `@socket.io/redis-adapter`, `socket.io-client`).
+- Decisions:
+  - Disabled Redis adapter setup in `NODE_ENV=test` to keep automated tests deterministic while still configuring Redis adapter for runtime environments.
+- Mistakes/Fixes:
+  - Initial file additions included duplicated blocks in socket files/tests; files were rebuilt cleanly before final verification.
+- Lessons Learned:
+  - For Socket.IO testability, separating auth/connection concerns into small modules enables both unit and integration coverage.
+
 ## 2026-02-17 - Task 9 CI dependency fix (zod, express-rate-limit)
 
 - Summary:
