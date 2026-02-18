@@ -2,6 +2,19 @@
 
 Project decision and progress log. Update this file on every commit.
 
+## 2026-02-17 - Docker build order fix for shared package
+
+- Summary:
+  - Updated `apps/server/Dockerfile` to build `@collabboard/shared` before building `server`.
+  - This ensures shared `dist` types exist when `apps/server` TypeScript compilation resolves `@collabboard/shared`.
+- Decisions:
+  - Keep the fix in Docker layer order rather than changing import paths or package wiring, since workspace dependency order is the root cause during image builds.
+- Mistakes/Fixes:
+  - Mistake: Docker was running `pnpm --filter server build` before shared package artifacts were generated, causing module resolution failures.
+  - Fix: chain build commands so shared builds first, then server.
+- Lessons Learned:
+  - Monorepo Docker builds must respect inter-package build dependencies explicitly, even when package manifests are present.
+
 ## 2026-02-17 - CI e2e command isolation for reliable merges
 
 - Summary:
