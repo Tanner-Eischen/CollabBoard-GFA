@@ -14,7 +14,7 @@ COPY . .
 # Install deps after source copy so node_modules is not overwritten
 RUN corepack enable && pnpm install --frozen-lockfile=false
 
-RUN pnpm --filter server build
+RUN pnpm --filter @collabboard/shared build && pnpm --filter server build
 
 ENV NODE_ENV=production
 EXPOSE 3001
