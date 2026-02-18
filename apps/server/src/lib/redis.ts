@@ -1,5 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const Redis = require("ioredis");
+import { Redis } from "ioredis";
 
 const redisUrl = process.env.REDIS_URL ?? "redis://localhost:6379";
 

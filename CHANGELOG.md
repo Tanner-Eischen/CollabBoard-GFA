@@ -2,6 +2,19 @@
 
 Project decision and progress log. Update this file on every commit.
 
+## 2026-02-17 - Render hotfix: Redis ESM import
+
+- Summary:
+  - Replaced CommonJS `require("ioredis")` in `apps/server/src/lib/redis.ts` with ESM named import.
+  - Restored compatibility with server runtime using `"type": "module"` and Node ESM execution on Render.
+- Decisions:
+  - Use `import { Redis } from "ioredis"` to align with current TypeScript/Node module mode rather than introducing CJS wrappers.
+- Mistakes/Fixes:
+  - Mistake: `require` remained in an ESM package and crashed production startup (`ReferenceError: require is not defined in ES module scope`).
+  - Fix: migrated Redis import to ESM syntax.
+- Lessons Learned:
+  - After large merges, re-verify startup-critical files (`index.ts`, DB/Redis clients, env loaders) on `main` to catch regressions before deployment.
+
 ## 2026-02-17 - Docker build order fix for shared package
 
 - Summary:
